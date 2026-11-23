@@ -3,7 +3,7 @@ import QtQuick.Layouts
 
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
-import org.kde.plasma.plasma5support as Plasma5Support
+import org.kde.plasma.private.volume
 
 PlasmoidItem {
     id: root
@@ -11,6 +11,7 @@ PlasmoidItem {
     property int targetVolumePercent: -1
     property real displayedVolumePercent: -1
     property bool muted: false
+    readonly property var preferredSink: PreferredDevice.sink
 
     readonly property int updateBehavior: Math.max(0, Math.min(2, Number(Plasmoid.configuration.updateBehavior) || 0))
     readonly property int customInterval: Math.max(100, Math.min(2000, Number(Plasmoid.configuration.customInterval) || 250))
@@ -67,14 +68,65 @@ PlasmoidItem {
 
     function clearVolumeState() {
         settleTimer.stop();
+        customUpdateTimer.stop();
         volumeTween.stop();
         targetVolumePercent = -1;
         displayedVolumePercent = -1;
         muted = false;
     }
 
+    function updateVolumeFromSink() {
+        const sink = preferredSink;
+
+        if (!sink || sink.name === "auto_null") {
+            clearVolumeState();
+            return;
+        }
+
+        const volume = Number(sink.volume);
+        const normalVolume = Number(PulseAudio.NormalVolume);
+
+        if (!Number.isFinite(volume) || volume < 0
+            || !Number.isFinite(normalVolume) || normalVolume <= 0) {
+            clearVolumeState();
+            return;
+        }
+
+        const newVolumePercent = Math.round(volume / normalVolume * 100.0);
+        muted = Boolean(sink.muted);
+
+        if (newVolumePercent === targetVolumePercent) {
+            return;
+        }
+
+        targetVolumePercent = newVolumePercent;
+
+        if (displayedVolumePercent < 0) {
+            settleTimer.stop();
+            customUpdateTimer.stop();
+            applyDisplayedVolume(newVolumePercent);
+        } else if (updateBehavior === 1) {
+            customUpdateTimer.stop();
+            volumeTween.stop();
+            settleTimer.restart();
+        } else if (updateBehavior === 2) {
+            settleTimer.stop();
+
+            if (!customUpdateTimer.running) {
+                customUpdateTimer.start();
+            }
+        } else {
+            settleTimer.stop();
+            customUpdateTimer.stop();
+            applyDisplayedVolume(newVolumePercent);
+        }
+    }
+
+    onPreferredSinkChanged: updateVolumeFromSink()
+
     onUpdateBehaviorChanged: {
         settleTimer.stop();
+        customUpdateTimer.stop();
 
         if (targetVolumePercent < 0) {
             return;
@@ -83,14 +135,21 @@ PlasmoidItem {
         if (updateBehavior === 1 && Math.round(displayedVolumePercent) !== targetVolumePercent) {
             volumeTween.stop();
             settleTimer.restart();
-        } else if (updateBehavior !== 1) {
+        } else {
             applyDisplayedVolume(targetVolumePercent);
+        }
+    }
+
+    onCustomIntervalChanged: {
+        if (customUpdateTimer.running) {
+            customUpdateTimer.restart();
         }
     }
 
     onTweeningEnabledChanged: {
         if (!tweeningEnabled) {
             volumeTween.stop();
+            customUpdateTimer.stop();
 
             if (targetVolumePercent >= 0 && (updateBehavior !== 1 || !settleTimer.running)) {
                 displayedVolumePercent = targetVolumePercent;
@@ -198,55 +257,26 @@ PlasmoidItem {
         easing.type: Easing.OutCubic
     }
 
-    Plasma5Support.DataSource {
-        id: volumeSource
+    Timer {
+        id: customUpdateTimer
 
-        engine: "executable"
-        connectedSources: ["wpctl get-volume @DEFAULT_AUDIO_SINK@"]
-        interval: root.updateBehavior === 2 ? root.customInterval : 250
+        interval: root.customInterval
+        repeat: false
+        onTriggered: root.applyDisplayedVolume(root.targetVolumePercent)
+    }
 
-        onNewData: (sourceName, data) => {
-            const exitCode = Number(data["exit code"]);
-            const output = String(data["stdout"] || "");
+    Connections {
+        target: root.preferredSink
+        ignoreUnknownSignals: true
 
-            if (exitCode !== 0) {
-                root.clearVolumeState();
-                return;
-            }
+        function onVolumeChanged() {
+            root.updateVolumeFromSink();
+        }
 
-            const match = output.match(/Volume:?\s*(\d+(?:\.\d+)?)/);
-            if (!match) {
-                root.clearVolumeState();
-                return;
-            }
-
-            const volume = Number(match[1]);
-            if (isNaN(volume)) {
-                root.clearVolumeState();
-                return;
-            }
-
-            const newVolumePercent = Math.round(volume * 100);
-            root.muted = output.indexOf("[MUTED]") !== -1;
-
-            if (newVolumePercent === root.targetVolumePercent) {
-                return;
-            }
-
-            root.targetVolumePercent = newVolumePercent;
-
-            if (root.displayedVolumePercent < 0 || root.updateBehavior !== 1) {
-                settleTimer.stop();
-                root.applyDisplayedVolume(newVolumePercent);
-            } else {
-                volumeTween.stop();
-
-                if (Math.round(root.displayedVolumePercent) === newVolumePercent) {
-                    settleTimer.stop();
-                } else {
-                    settleTimer.restart();
-                }
-            }
+        function onMutedChanged() {
+            root.updateVolumeFromSink();
         }
     }
+
+    Component.onCompleted: updateVolumeFromSink()
 }

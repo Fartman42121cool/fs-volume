@@ -5,14 +5,8 @@ A minimal KDE Plasma 6 widget that displays the current default audio output vol
 ## Requirements
 
 - KDE Plasma 6
-- PipeWire with WirePlumber
-- `wpctl` (provided by WirePlumber)
-
-You can check that `wpctl` is available by running:
-
-```bash
-wpctl get-volume @DEFAULT_AUDIO_SINK@
-```
+- `plasma-pa` (provides KDE's `org.kde.plasma.private.volume` QML module)
+- PipeWire with WirePlumber and `pipewire-pulse`, or another PulseAudio-compatible audio server
 
 ## Install
 
@@ -49,12 +43,12 @@ Right-click FS Volume and open **Configure FS Volume**.
 
 ### Behavior
 
-- **UI update behavior:** Choose Every Update to refresh whenever a changed volume is detected, When Finished Changing to wait 1.5 seconds after the last detected change, or Custom Interval to choose the polling interval.
-- **Custom interval:** Set the polling interval from 100 to 2,000 milliseconds. Shorter intervals react faster but run `wpctl` more frequently. This setting is only shown when Custom Interval is selected.
+- **UI update behavior:** Choose Every Update to refresh as volume changes arrive, When Finished Changing to wait 1.5 seconds after the last detected change, or Custom Interval to limit how often the displayed value refreshes.
+- **Custom interval:** Limit visible volume updates to a chosen interval from 100 to 2,000 milliseconds. The audio state is still monitored immediately; this setting is only shown when Custom Interval is selected.
 - **Volume tweening:** Optionally animate the displayed percentage when its value changes. Fast, Medium, and Slow presets adjust the animation. Larger changes take longer overall but move more percentage points per second, and the animation eases out near the target.
 
 ## How it works
 
-By default, the widget runs `wpctl get-volume @DEFAULT_AUDIO_SINK@` every 250 milliseconds and displays the rounded percentage. The update behavior setting can defer display updates or change the polling interval. Volume tweening is handled by QML animation; no extra process or background service is needed.
+The widget observes the current default output through KDE's PulseAudioQt-backed volume model. Volume and mute changes arrive as property-change signals, so the widget does not poll `wpctl` or launch recurring subprocesses. The update behavior setting controls when those changes are shown. Volume tweening is handled by QML animation; no extra process or background service is needed.
 
 No compilation or root access is required.
