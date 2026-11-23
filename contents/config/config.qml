@@ -7,4 +7,10 @@ ConfigModel {
         icon: "preferences-desktop-theme"
         source: "configGeneral.qml"
     }
+
+    ConfigCategory {
+        name: i18n("Behavior")
+        icon: "preferences-system-performance"
+        source: "configBehavior.qml"
+    }
 }
