@@ -1,6 +1,6 @@
 # FS Volume
 
-A small Plasma 6 panel widget that shows your default output volume as an icon and percentage. No slider or popup—just the readout.
+A small Plasma 6 panel widget that shows your default output volume as an icon and percentage.
 
 Needs KDE Plasma 6, `plasma-pa`, and a PulseAudio-compatible audio server (PipeWire with `pipewire-pulse` works).
 
