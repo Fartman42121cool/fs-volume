@@ -107,7 +107,7 @@ PlasmoidItem {
 
         engine: "executable"
         connectedSources: ["wpctl get-volume @DEFAULT_AUDIO_SINK@"]
-        interval: 1500
+        interval: 250
 
         onNewData: (sourceName, data) => {
             const exitCode = Number(data["exit code"]);
