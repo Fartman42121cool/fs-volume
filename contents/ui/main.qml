@@ -15,7 +15,6 @@ PlasmoidItem {
     readonly property string customIconPath: String(Plasmoid.configuration.iconPath || "")
     readonly property string customFontFamily: String(Plasmoid.configuration.fontFamily || "")
 
-    preferredRepresentation: compactRepresentation
 
     toolTipMainText: i18n("Output volume")
     toolTipSubText: volumePercent >= 0
