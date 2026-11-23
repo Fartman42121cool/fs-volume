@@ -11,7 +11,7 @@ PlasmoidItem {
     property int volumePercent: -1
     property bool muted: false
 
-    Plasmoid.preferredRepresentation: Plasmoid.fullRepresentation
+    preferredRepresentation: fullRepresentation
 
     toolTipMainText: i18n("Output volume")
     toolTipSubText: volumePercent >= 0
