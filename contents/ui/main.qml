@@ -238,10 +238,14 @@ PlasmoidItem {
             if (root.displayedVolumePercent < 0 || root.updateBehavior !== 1) {
                 settleTimer.stop();
                 root.applyDisplayedVolume(newVolumePercent);
-            } else if (Math.round(root.displayedVolumePercent) === newVolumePercent) {
-                settleTimer.stop();
             } else {
-                settleTimer.restart();
+                volumeTween.stop();
+
+                if (Math.round(root.displayedVolumePercent) === newVolumePercent) {
+                    settleTimer.stop();
+                } else {
+                    settleTimer.restart();
+                }
             }
         }
     }
