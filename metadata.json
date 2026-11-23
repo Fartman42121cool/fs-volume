@@ -1,0 +1,18 @@
+{
+  "KPlugin": {
+    "Authors": [
+      {
+        "Name": "Fartman42121cool"
+      }
+    ],
+    "Category": "System Information",
+    "Description": "Displays the current audio output volume as a percentage in the panel.",
+    "Icon": "audio-volume-high",
+    "Id": "com.github.fartman42121cool.fs-volume",
+    "Name": "FS Volume",
+    "Version": "1.0",
+    "Website": "https://github.com/Fartman42121cool/fs-volume"
+  },
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "KPackageStructure": "Plasma/Applet"
+}
