@@ -10,6 +10,7 @@ PlasmoidItem {
 
     property int volumePercent: -1
     property bool muted: false
+    property string debugText: "Waiting for data..."
 
     readonly property string customIconPath: String(Plasmoid.configuration.iconPath || "")
     readonly property string customFontFamily: String(Plasmoid.configuration.fontFamily || "")
@@ -82,7 +83,7 @@ PlasmoidItem {
                 }
 
                 Text {
-                    text: root.volumePercent >= 0 ? root.volumePercent + "%" : "—"
+                    text: root.debugText
                     color: Kirigami.Theme.textColor
                     font.family: root.customFontFamily
                     font.pixelSize: 12
@@ -113,6 +114,9 @@ PlasmoidItem {
         onNewData: (sourceName, data) => {
             const exitCode = Number(data["exit code"]);
             const output = String(data["stdout"] || "");
+            root.debugText = "Exit: " + exitCode
+                + " | Output: " + output.trim()
+                + " | Error: " + String(data["stderr"] || "").trim();
 
             if (exitCode !== 0) {
                 root.volumePercent = -1;
@@ -120,7 +124,7 @@ PlasmoidItem {
                 return;
             }
 
-            const match = output.match(/Volume:\\s*(\\d+(?:\\.\\d+)?)/);
+            const match = output.match(/Volume:\s*(\d+(?:\.\d+)?)/);
             if (!match) {
                 root.volumePercent = -1;
                 root.muted = false;
