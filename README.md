@@ -31,8 +31,22 @@ kpackagetool6 --type Plasma/Applet --install .
 
 Then right-click your panel, choose **Enter Edit Mode → Add Widgets**, search for **FS Volume**, and add it.
 
-No compilation, root access, or separate background service is required.
+To update an existing installation after pulling new commits:
+
+```bash
+git pull
+kpackagetool6 --type Plasma/Applet --upgrade .
+```
+
+## Customize
+
+Right-click FS Volume and open **Configure FS Volume**.
+
+- **Volume icon:** Choose a PNG, JPG, SVG, or WebP image. The widget stores the selected file's location, so keep the image in place. Use Reset to return to the built-in speaker icon. The built-in muted icon is still shown when output is muted or set to zero.
+- **Percentage font:** Choose an installed font for the percentage. Use Reset to return to the system default font.
 
 ## How it works
 
-The widget runs `wpctl get-volume @DEFAULT_AUDIO_SINK@` every 1.5 seconds, reads the default output's volume, and displays the rounded percentage. Its speaker icon changes with the volume level and indicates when the output is muted.
+The widget runs `wpctl get-volume @DEFAULT_AUDIO_SINK@` every 1.5 seconds, reads the default output's volume, and displays the rounded percentage. Its built-in speaker icon changes with the volume level and indicates when the output is muted.
+
+No compilation, root access, or separate background service is required.
