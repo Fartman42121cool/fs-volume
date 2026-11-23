@@ -27,6 +27,8 @@ PlasmoidItem {
         Item {
             implicitWidth: content.implicitWidth
             implicitHeight: content.implicitHeight
+            Layout.minimumWidth: implicitWidth
+            Layout.minimumHeight: implicitHeight
 
             RowLayout {
                 id: content
@@ -93,7 +95,7 @@ PlasmoidItem {
             MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton
-                onClicked: root.expanded = !root.expanded
+                onClicked: plasmoid.expanded = !plasmoid.expanded
             }
         }
     }
