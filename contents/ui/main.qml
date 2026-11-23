@@ -81,6 +81,7 @@ PlasmoidItem {
         }
 
         if (updateBehavior === 1 && Math.round(displayedVolumePercent) !== targetVolumePercent) {
+            volumeTween.stop();
             settleTimer.restart();
         } else if (updateBehavior !== 1) {
             applyDisplayedVolume(targetVolumePercent);
@@ -88,9 +89,10 @@ PlasmoidItem {
     }
 
     onTweeningEnabledChanged: {
-        if (!tweeningEnabled && updateBehavior !== 1) {
+        if (!tweeningEnabled) {
             volumeTween.stop();
-            if (targetVolumePercent >= 0) {
+
+            if (targetVolumePercent >= 0 && (updateBehavior !== 1 || !settleTimer.running)) {
                 displayedVolumePercent = targetVolumePercent;
             }
         }
