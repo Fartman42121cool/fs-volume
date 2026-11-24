@@ -25,7 +25,7 @@ kpackagetool6 --type Plasma/Applet --upgrade .
 
 Right-click the widget and open **Configure FS Volume**.
 
-Appearance lets you choose separate speaker images for high, medium, low, and muted states, plus the percentage font. Leave an image field empty to use the icon from your current KDE icon theme.
+Appearance lets you choose separate speaker images for high, medium, low, and muted states, hide the speaker icon, and choose the percentage font. Leave an image field empty to use the icon from your current KDE icon theme.
 
 Behavior controls when the displayed number updates: immediately, 1.5 seconds after volume changes stop, or at a chosen interval. Tweening can animate changes at Fast, Medium, or Slow speed.
 

@@ -14,6 +14,9 @@ PlasmoidItem {
     property bool muted: false
     readonly property var preferredSink: PreferredDevice.sink
     readonly property bool verticalPanel: Plasmoid.formFactor === PlasmaCore.Types.Vertical
+        || Plasmoid.location === PlasmaCore.Types.LeftEdge
+        || Plasmoid.location === PlasmaCore.Types.RightEdge
+    readonly property bool showIcon: Plasmoid.configuration.showIcon !== false
 
     readonly property int updateBehavior: Math.max(0, Math.min(2, Number(Plasmoid.configuration.updateBehavior) || 0))
     readonly property int customInterval: Math.max(100, Math.min(2000, Number(Plasmoid.configuration.customInterval) || 250))
@@ -28,11 +31,11 @@ PlasmoidItem {
     readonly property string customIconPath: {
         let statePath = "";
 
-        if (muted || displayedVolumePercent === 0) {
+        if (muted || targetVolumePercent === 0) {
             statePath = mutedIconPath;
-        } else if (displayedVolumePercent >= 0 && displayedVolumePercent <= 33) {
+        } else if (targetVolumePercent >= 0 && targetVolumePercent <= 33) {
             statePath = lowIconPath;
-        } else if (displayedVolumePercent >= 0 && displayedVolumePercent <= 66) {
+        } else if (targetVolumePercent >= 0 && targetVolumePercent <= 66) {
             statePath = mediumIconPath;
         } else {
             statePath = highIconPath;
@@ -42,7 +45,7 @@ PlasmoidItem {
             return statePath;
         }
 
-        return !muted && displayedVolumePercent !== 0 ? legacyIconPath : "";
+        return !muted && targetVolumePercent !== 0 ? legacyIconPath : "";
     }
     readonly property string customFontFamily: String(Plasmoid.configuration.fontFamily || "")
 
@@ -189,13 +192,8 @@ PlasmoidItem {
             id: readout
 
             readonly property real panelThickness: {
-                if (root.verticalPanel) {
-                    return width;
-                }
-                if (Plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
-                    return height;
-                }
-                return Kirigami.Units.iconSizes.small / 0.68;
+                const thickness = root.verticalPanel ? width : height;
+                return thickness > 0 ? thickness : Kirigami.Units.iconSizes.small / 0.68;
             }
             readonly property real iconSize: Math.max(12, Math.min(48, panelThickness * 0.68))
             readonly property int fontPixelSize: Math.max(10, Math.min(24, Math.round(iconSize * 0.72)))
@@ -203,21 +201,21 @@ PlasmoidItem {
             implicitWidth: content.implicitWidth
             implicitHeight: content.implicitHeight
 
-            Layout.preferredWidth: root.verticalPanel ? Kirigami.Units.iconSizes.small : implicitWidth
-            Layout.preferredHeight: root.verticalPanel ? implicitHeight : Kirigami.Units.iconSizes.small
-            Layout.minimumWidth: root.verticalPanel ? 0 : implicitWidth
-            Layout.minimumHeight: root.verticalPanel ? implicitHeight : 0
+            Layout.minimumWidth: root.verticalPanel ? 0 : height
+            Layout.minimumHeight: root.verticalPanel ? width : 0
 
             GridLayout {
                 id: content
 
                 anchors.fill: parent
-                columns: root.verticalPanel ? 1 : 2
-                rows: root.verticalPanel ? 2 : 1
-                columnSpacing: root.verticalPanel ? 0 : Kirigami.Units.smallSpacing
-                rowSpacing: root.verticalPanel ? Kirigami.Units.smallSpacing / 2 : 0
+                columns: root.verticalPanel || !root.showIcon ? 1 : 2
+                rows: root.verticalPanel && root.showIcon ? 2 : 1
+                columnSpacing: root.verticalPanel || !root.showIcon ? 0 : Kirigami.Units.smallSpacing
+                rowSpacing: root.verticalPanel && root.showIcon ? Kirigami.Units.smallSpacing / 2 : 0
 
                 Item {
+                    visible: root.showIcon
+
                     Layout.preferredWidth: readout.iconSize
                     Layout.preferredHeight: readout.iconSize
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -227,28 +225,29 @@ PlasmoidItem {
 
                         anchors.fill: parent
                         source: root.customIconPath
-                        visible: root.customIconPath.length > 0 && status === Image.Ready
-                        asynchronous: true
+                        visible: root.showIcon && root.customIconPath.length > 0 && status === Image.Ready
+                        asynchronous: false
+                        cache: false
                         smooth: true
                         fillMode: Image.PreserveAspectFit
                         sourceSize: Qt.size(readout.iconSize, readout.iconSize)
                     }
 
                     Kirigami.Icon {
-                        visible: !customIcon.visible
+                        visible: root.showIcon && !customIcon.visible
 
                         anchors.fill: parent
                         source: {
-                            if (root.muted || root.displayedVolumePercent === 0) {
+                            if (root.muted || root.targetVolumePercent === 0) {
                                 return "audio-volume-muted";
                             }
-                            if (root.displayedVolumePercent < 0) {
+                            if (root.targetVolumePercent < 0) {
                                 return "audio-volume-high";
                             }
-                            if (root.displayedVolumePercent <= 33) {
+                            if (root.targetVolumePercent <= 33) {
                                 return "audio-volume-low";
                             }
-                            if (root.displayedVolumePercent <= 66) {
+                            if (root.targetVolumePercent <= 66) {
                                 return "audio-volume-medium";
                             }
                             return "audio-volume-high";
@@ -265,7 +264,7 @@ PlasmoidItem {
                     font.pixelSize: readout.fontPixelSize
                     font.weight: Font.Medium
 
-                    Layout.alignment: root.verticalPanel
+                    Layout.alignment: root.verticalPanel || !root.showIcon
                         ? Qt.AlignHCenter | Qt.AlignVCenter
                         : Qt.AlignVCenter
                 }

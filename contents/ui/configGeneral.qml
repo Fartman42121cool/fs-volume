@@ -11,6 +11,7 @@ Kirigami.FormLayout {
     property alias cfg_iconMediumPath: mediumIconPathField.text
     property alias cfg_iconLowPath: lowIconPathField.text
     property alias cfg_iconMutedPath: mutedIconPathField.text
+    property alias cfg_showIcon: showIconCheckBox.checked
     property alias cfg_fontFamily: fontFamilyField.text
 
     function browseForIcon(setting) {
@@ -21,6 +22,13 @@ Kirigami.FormLayout {
     Kirigami.Separator {
         Kirigami.FormData.isSection: true
         Kirigami.FormData.label: i18n("Appearance")
+    }
+
+    QQC2.CheckBox {
+        id: showIconCheckBox
+
+        Kirigami.FormData.label: i18n("Speaker icon:")
+        text: i18n("Show icon")
     }
 
     RowLayout {

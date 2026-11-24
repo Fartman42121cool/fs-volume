@@ -20,6 +20,9 @@
         <entry name="iconMutedPath" type="String">
             <default></default>
         </entry>
+        <entry name="showIcon" type="Bool">
+            <default>true</default>
+        </entry>
         <entry name="fontFamily" type="String">
             <default></default>
         </entry>
