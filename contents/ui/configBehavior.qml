@@ -11,6 +11,11 @@ Kirigami.FormLayout {
     property alias cfg_tweeningEnabled: tweeningCheck.checked
     property alias cfg_tweenSpeed: tweenSpeedCombo.currentIndex
 
+    Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18n("Behavior")
+    }
+
     QQC2.ComboBox {
         id: updateBehaviorCombo
 

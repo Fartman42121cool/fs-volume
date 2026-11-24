@@ -18,6 +18,11 @@ Kirigami.FormLayout {
         iconDialog.open();
     }
 
+    Kirigami.Separator {
+        Kirigami.FormData.isSection: true
+        Kirigami.FormData.label: i18n("Appearance")
+    }
+
     RowLayout {
         Kirigami.FormData.label: i18n("High volume:")
 
