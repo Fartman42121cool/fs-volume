@@ -10,7 +10,7 @@
     "Icon": "audio-volume-high",
     "Id": "com.github.fartman42121cool.fs-volume",
     "Name": "FS Volume",
-    "Version": "1.6",
+    "Version": "1.7",
     "Website": "https://github.com/Fartman42121cool/fs-volume"
   },
   "X-Plasma-API-Minimum-Version": "6.0",

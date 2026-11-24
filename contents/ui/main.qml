@@ -197,28 +197,49 @@ PlasmoidItem {
             }
             readonly property real iconSize: Math.max(12, Math.min(48, panelThickness * 0.68))
             readonly property int fontPixelSize: Math.max(10, Math.min(24, Math.round(iconSize * 0.72)))
+            readonly property bool inPanel: [
+                PlasmaCore.Types.TopEdge,
+                PlasmaCore.Types.RightEdge,
+                PlasmaCore.Types.BottomEdge,
+                PlasmaCore.Types.LeftEdge
+            ].includes(Plasmoid.location)
 
-            implicitWidth: content.implicitWidth
-            implicitHeight: content.implicitHeight
+            implicitWidth: contentLoader.implicitWidth
+            implicitHeight: contentLoader.implicitHeight
 
-            Layout.minimumWidth: root.verticalPanel ? 0 : height
-            Layout.minimumHeight: root.verticalPanel ? width : 0
+            Layout.minimumWidth: {
+                if (root.verticalPanel) {
+                    return 0;
+                }
+                if (Plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
+                    return height;
+                }
+                return Kirigami.Units.gridUnit * 3;
+            }
 
-            GridLayout {
-                id: content
+            Layout.minimumHeight: {
+                if (root.verticalPanel) {
+                    return width;
+                }
+                if (Plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
+                    return 0;
+                }
+                return Kirigami.Units.gridUnit * 3;
+            }
+
+            Loader {
+                id: contentLoader
 
                 anchors.fill: parent
-                columns: root.verticalPanel || !root.showIcon ? 1 : 2
-                rows: root.verticalPanel && root.showIcon ? 2 : 1
-                columnSpacing: root.verticalPanel || !root.showIcon ? 0 : Kirigami.Units.smallSpacing
-                rowSpacing: root.verticalPanel && root.showIcon ? Kirigami.Units.smallSpacing / 2 : 0
+                sourceComponent: root.verticalPanel ? verticalReadout : horizontalReadout
+            }
+
+            Component {
+                id: iconRepresentation
 
                 Item {
-                    visible: root.showIcon
-
-                    Layout.preferredWidth: readout.iconSize
-                    Layout.preferredHeight: readout.iconSize
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    implicitWidth: readout.iconSize
+                    implicitHeight: readout.iconSize
 
                     Image {
                         id: customIcon
@@ -254,6 +275,10 @@ PlasmoidItem {
                         }
                     }
                 }
+            }
+
+            Component {
+                id: percentageRepresentation
 
                 Text {
                     text: root.displayedVolumePercent >= 0
@@ -263,10 +288,49 @@ PlasmoidItem {
                     font.family: root.customFontFamily
                     font.pixelSize: readout.fontPixelSize
                     font.weight: Font.Medium
+                    font.strikeout: root.muted && !root.showIcon
+                }
+            }
 
-                    Layout.alignment: root.verticalPanel || !root.showIcon
-                        ? Qt.AlignHCenter | Qt.AlignVCenter
-                        : Qt.AlignVCenter
+            Component {
+                id: horizontalReadout
+
+                RowLayout {
+                    spacing: Kirigami.Units.smallSpacing
+
+                    Loader {
+                        active: root.showIcon
+                        visible: root.showIcon
+                        sourceComponent: iconRepresentation
+                        Layout.alignment: Qt.AlignVCenter
+                    }
+
+                    Loader {
+                        sourceComponent: percentageRepresentation
+                        Layout.alignment: root.showIcon
+                            ? Qt.AlignVCenter
+                            : Qt.AlignHCenter | Qt.AlignVCenter
+                    }
+                }
+            }
+
+            Component {
+                id: verticalReadout
+
+                ColumnLayout {
+                    spacing: Kirigami.Units.smallSpacing / 2
+
+                    Loader {
+                        active: root.showIcon
+                        visible: root.showIcon
+                        sourceComponent: iconRepresentation
+                        Layout.alignment: Qt.AlignHCenter
+                    }
+
+                    Loader {
+                        sourceComponent: percentageRepresentation
+                        Layout.alignment: Qt.AlignHCenter
+                    }
                 }
             }
 
