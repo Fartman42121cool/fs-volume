@@ -197,8 +197,8 @@ PlasmoidItem {
                 }
                 return Kirigami.Units.iconSizes.small / 0.68;
             }
-            readonly property real iconSize: Math.max(12, Math.min(32, panelThickness * 0.68))
-            readonly property int fontPixelSize: Math.max(10, Math.min(18, Math.round(iconSize * 0.72)))
+            readonly property real iconSize: Math.max(12, Math.min(48, panelThickness * 0.68))
+            readonly property int fontPixelSize: Math.max(10, Math.min(24, Math.round(iconSize * 0.72)))
 
             implicitWidth: content.implicitWidth
             implicitHeight: content.implicitHeight
