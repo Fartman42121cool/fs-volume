@@ -25,7 +25,7 @@ kpackagetool6 --type Plasma/Applet --upgrade .
 
 Right-click the widget and open **Configure FS Volume**.
 
-Appearance lets you pick a speaker image and the percentage font.
+Appearance lets you choose separate speaker images for high, medium, low, and muted states, plus the percentage font.
 
 Behavior controls when the displayed number updates: immediately, 1.5 seconds after volume changes stop, or at a chosen interval. Tweening can animate changes at Fast, Medium, or Slow speed.
 

@@ -6,11 +6,11 @@
       }
     ],
     "Category": "System Information",
-    "Description": "Displays the current audio output volume as a percentage in the panel.",
+    "Description": "Displays output volume with customizable speaker icons and percentage.",
     "Icon": "audio-volume-high",
     "Id": "com.github.fartman42121cool.fs-volume",
     "Name": "FS Volume",
-    "Version": "1.3",
+    "Version": "1.4",
     "Website": "https://github.com/Fartman42121cool/fs-volume"
   },
   "X-Plasma-API-Minimum-Version": "6.0",

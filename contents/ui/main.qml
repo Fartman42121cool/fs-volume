@@ -18,7 +18,30 @@ PlasmoidItem {
     readonly property bool tweeningEnabled: Plasmoid.configuration.tweeningEnabled
     readonly property int tweenSpeed: Math.max(0, Math.min(2, Number(Plasmoid.configuration.tweenSpeed) || 0))
 
-    readonly property string customIconPath: String(Plasmoid.configuration.iconPath || "")
+    readonly property string legacyIconPath: String(Plasmoid.configuration.iconPath || "")
+    readonly property string highIconPath: String(Plasmoid.configuration.iconHighPath || "")
+    readonly property string mediumIconPath: String(Plasmoid.configuration.iconMediumPath || "")
+    readonly property string lowIconPath: String(Plasmoid.configuration.iconLowPath || "")
+    readonly property string mutedIconPath: String(Plasmoid.configuration.iconMutedPath || "")
+    readonly property string customIconPath: {
+        let statePath = "";
+
+        if (muted || displayedVolumePercent === 0) {
+            statePath = mutedIconPath;
+        } else if (displayedVolumePercent >= 0 && displayedVolumePercent <= 33) {
+            statePath = lowIconPath;
+        } else if (displayedVolumePercent >= 0 && displayedVolumePercent <= 66) {
+            statePath = mediumIconPath;
+        } else {
+            statePath = highIconPath;
+        }
+
+        if (statePath.length > 0) {
+            return statePath;
+        }
+
+        return !muted && displayedVolumePercent !== 0 ? legacyIconPath : "";
+    }
     readonly property string customFontFamily: String(Plasmoid.configuration.fontFamily || "")
 
     toolTipMainText: i18n("Output volume")
@@ -176,10 +199,7 @@ PlasmoidItem {
                     id: customIcon
 
                     source: root.customIconPath
-                    visible: root.customIconPath.length > 0
-                        && status === Image.Ready
-                        && !root.muted
-                        && root.displayedVolumePercent !== 0
+                    visible: root.customIconPath.length > 0 && status === Image.Ready
                     asynchronous: true
                     smooth: true
                     fillMode: Image.PreserveAspectFit

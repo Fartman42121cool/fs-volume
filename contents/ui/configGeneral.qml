@@ -7,28 +7,102 @@ import org.kde.kirigami as Kirigami
 Kirigami.FormLayout {
     id: page
 
-    property alias cfg_iconPath: iconPathField.text
+    property alias cfg_iconHighPath: highIconPathField.text
+    property alias cfg_iconMediumPath: mediumIconPathField.text
+    property alias cfg_iconLowPath: lowIconPathField.text
+    property alias cfg_iconMutedPath: mutedIconPathField.text
     property alias cfg_fontFamily: fontFamilyField.text
 
+    function browseForIcon(setting) {
+        iconDialog.targetSetting = setting;
+        iconDialog.open();
+    }
+
     RowLayout {
-        Kirigami.FormData.label: i18n("Volume icon:")
+        Kirigami.FormData.label: i18n("High volume:")
 
         QQC2.TextField {
-            id: iconPathField
+            id: highIconPathField
 
-            placeholderText: i18n("Use the built-in icon")
+            placeholderText: i18n("Use the KDE icon")
             Layout.fillWidth: true
         }
 
         QQC2.Button {
             text: i18n("Browse…")
-            onClicked: iconDialog.open()
+            onClicked: page.browseForIcon("high")
         }
 
         QQC2.Button {
             text: i18n("Reset")
-            enabled: iconPathField.text.length > 0
-            onClicked: iconPathField.clear()
+            enabled: highIconPathField.text.length > 0
+            onClicked: highIconPathField.clear()
+        }
+    }
+
+    RowLayout {
+        Kirigami.FormData.label: i18n("Medium volume:")
+
+        QQC2.TextField {
+            id: mediumIconPathField
+
+            placeholderText: i18n("Use the KDE icon")
+            Layout.fillWidth: true
+        }
+
+        QQC2.Button {
+            text: i18n("Browse…")
+            onClicked: page.browseForIcon("medium")
+        }
+
+        QQC2.Button {
+            text: i18n("Reset")
+            enabled: mediumIconPathField.text.length > 0
+            onClicked: mediumIconPathField.clear()
+        }
+    }
+
+    RowLayout {
+        Kirigami.FormData.label: i18n("Low volume:")
+
+        QQC2.TextField {
+            id: lowIconPathField
+
+            placeholderText: i18n("Use the KDE icon")
+            Layout.fillWidth: true
+        }
+
+        QQC2.Button {
+            text: i18n("Browse…")
+            onClicked: page.browseForIcon("low")
+        }
+
+        QQC2.Button {
+            text: i18n("Reset")
+            enabled: lowIconPathField.text.length > 0
+            onClicked: lowIconPathField.clear()
+        }
+    }
+
+    RowLayout {
+        Kirigami.FormData.label: i18n("Muted:")
+
+        QQC2.TextField {
+            id: mutedIconPathField
+
+            placeholderText: i18n("Use the KDE icon")
+            Layout.fillWidth: true
+        }
+
+        QQC2.Button {
+            text: i18n("Browse…")
+            onClicked: page.browseForIcon("muted")
+        }
+
+        QQC2.Button {
+            text: i18n("Reset")
+            enabled: mutedIconPathField.text.length > 0
+            onClicked: mutedIconPathField.clear()
         }
     }
 
@@ -57,14 +131,37 @@ Kirigami.FormLayout {
     FileDialog {
         id: iconDialog
 
-        title: i18n("Select a volume icon")
+        property string targetSetting: ""
+
+        title: i18n("Select a speaker icon")
         fileMode: FileDialog.OpenFile
         nameFilters: [
             i18n("Image files (*.png *.jpg *.jpeg *.svg *.webp)"),
             i18n("All files (*)")
         ]
 
-        onAccepted: iconPathField.text = selectedFile.toString()
+        onAccepted: {
+            const path = selectedFile.toString();
+
+            switch (targetSetting) {
+            case "high":
+                highIconPathField.text = path;
+                break;
+            case "medium":
+                mediumIconPathField.text = path;
+                break;
+            case "low":
+                lowIconPathField.text = path;
+                break;
+            case "muted":
+                mutedIconPathField.text = path;
+                break;
+            }
+
+            targetSetting = "";
+        }
+
+        onRejected: targetSetting = ""
     }
 
     FontDialog {
