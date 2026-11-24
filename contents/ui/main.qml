@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 
 import org.kde.kirigami as Kirigami
+import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasmoid
 import org.kde.plasma.private.volume
 
@@ -12,6 +13,7 @@ PlasmoidItem {
     property real displayedVolumePercent: -1
     property bool muted: false
     readonly property var preferredSink: PreferredDevice.sink
+    readonly property bool verticalPanel: Plasmoid.formFactor === PlasmaCore.Types.Vertical
 
     readonly property int updateBehavior: Math.max(0, Math.min(2, Number(Plasmoid.configuration.updateBehavior) || 0))
     readonly property int customInterval: Math.max(100, Math.min(2000, Number(Plasmoid.configuration.customInterval) || 250))
@@ -184,57 +186,74 @@ PlasmoidItem {
         id: volumeReadout
 
         Item {
+            id: readout
+
+            readonly property real panelThickness: {
+                if (root.verticalPanel) {
+                    return width;
+                }
+                if (Plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
+                    return height;
+                }
+                return Kirigami.Units.iconSizes.small / 0.68;
+            }
+            readonly property real iconSize: Math.max(12, Math.min(32, panelThickness * 0.68))
+            readonly property int fontPixelSize: Math.max(10, Math.min(18, Math.round(iconSize * 0.72)))
+
             implicitWidth: content.implicitWidth
             implicitHeight: content.implicitHeight
-            Layout.minimumWidth: implicitWidth
-            Layout.minimumHeight: implicitHeight
 
-            RowLayout {
+            Layout.preferredWidth: root.verticalPanel ? Kirigami.Units.iconSizes.small : implicitWidth
+            Layout.preferredHeight: root.verticalPanel ? implicitHeight : Kirigami.Units.iconSizes.small
+            Layout.minimumWidth: root.verticalPanel ? 0 : implicitWidth
+            Layout.minimumHeight: root.verticalPanel ? implicitHeight : 0
+
+            GridLayout {
                 id: content
 
                 anchors.fill: parent
-                spacing: Kirigami.Units.smallSpacing
+                columns: root.verticalPanel ? 1 : 2
+                rows: root.verticalPanel ? 2 : 1
+                columnSpacing: root.verticalPanel ? 0 : Kirigami.Units.smallSpacing
+                rowSpacing: root.verticalPanel ? Kirigami.Units.smallSpacing / 2 : 0
 
-                Image {
-                    id: customIcon
+                Item {
+                    Layout.preferredWidth: readout.iconSize
+                    Layout.preferredHeight: readout.iconSize
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                    source: root.customIconPath
-                    visible: root.customIconPath.length > 0 && status === Image.Ready
-                    asynchronous: true
-                    smooth: true
-                    fillMode: Image.PreserveAspectFit
-                    sourceSize: Qt.size(
-                        Kirigami.Units.iconSizes.small,
-                        Kirigami.Units.iconSizes.small
-                    )
+                    Image {
+                        id: customIcon
 
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                    Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                    Layout.alignment: Qt.AlignVCenter
-                }
-
-                Kirigami.Icon {
-                    visible: !customIcon.visible
-
-                    source: {
-                        if (root.muted || root.displayedVolumePercent === 0) {
-                            return "audio-volume-muted";
-                        }
-                        if (root.displayedVolumePercent < 0) {
-                            return "audio-volume-high";
-                        }
-                        if (root.displayedVolumePercent <= 33) {
-                            return "audio-volume-low";
-                        }
-                        if (root.displayedVolumePercent <= 66) {
-                            return "audio-volume-medium";
-                        }
-                        return "audio-volume-high";
+                        anchors.fill: parent
+                        source: root.customIconPath
+                        visible: root.customIconPath.length > 0 && status === Image.Ready
+                        asynchronous: true
+                        smooth: true
+                        fillMode: Image.PreserveAspectFit
+                        sourceSize: Qt.size(readout.iconSize, readout.iconSize)
                     }
 
-                    Layout.preferredWidth: Kirigami.Units.iconSizes.small
-                    Layout.preferredHeight: Kirigami.Units.iconSizes.small
-                    Layout.alignment: Qt.AlignVCenter
+                    Kirigami.Icon {
+                        visible: !customIcon.visible
+
+                        anchors.fill: parent
+                        source: {
+                            if (root.muted || root.displayedVolumePercent === 0) {
+                                return "audio-volume-muted";
+                            }
+                            if (root.displayedVolumePercent < 0) {
+                                return "audio-volume-high";
+                            }
+                            if (root.displayedVolumePercent <= 33) {
+                                return "audio-volume-low";
+                            }
+                            if (root.displayedVolumePercent <= 66) {
+                                return "audio-volume-medium";
+                            }
+                            return "audio-volume-high";
+                        }
+                    }
                 }
 
                 Text {
@@ -243,10 +262,12 @@ PlasmoidItem {
                         : "—"
                     color: Kirigami.Theme.textColor
                     font.family: root.customFontFamily
-                    font.pixelSize: 12
+                    font.pixelSize: readout.fontPixelSize
                     font.weight: Font.Medium
 
-                    Layout.alignment: Qt.AlignVCenter
+                    Layout.alignment: root.verticalPanel
+                        ? Qt.AlignHCenter | Qt.AlignVCenter
+                        : Qt.AlignVCenter
                 }
             }
 

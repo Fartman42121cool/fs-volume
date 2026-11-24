@@ -1,6 +1,6 @@
 # FS Volume
 
-A small Plasma 6 panel widget that shows your default output volume as an icon and percentage.
+A small Plasma 6 panel widget that shows your default output volume as an icon and percentage. It adapts to horizontal and vertical panels and scales with panel size.
 
 Needs KDE Plasma 6, `plasma-pa`, and a PulseAudio-compatible audio server (PipeWire with `pipewire-pulse` works).
 
@@ -25,7 +25,7 @@ kpackagetool6 --type Plasma/Applet --upgrade .
 
 Right-click the widget and open **Configure FS Volume**.
 
-Appearance lets you choose separate speaker images for high, medium, low, and muted states, plus the percentage font.
+Appearance lets you choose separate speaker images for high, medium, low, and muted states, plus the percentage font. Leave an image field empty to use the icon from your current KDE icon theme.
 
 Behavior controls when the displayed number updates: immediately, 1.5 seconds after volume changes stop, or at a chosen interval. Tweening can animate changes at Fast, Medium, or Slow speed.
 

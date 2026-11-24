@@ -29,7 +29,7 @@ Kirigami.FormLayout {
         QQC2.TextField {
             id: highIconPathField
 
-            placeholderText: i18n("Use the KDE icon")
+            placeholderText: i18n("Use your default icon")
             Layout.fillWidth: true
         }
 
@@ -51,7 +51,7 @@ Kirigami.FormLayout {
         QQC2.TextField {
             id: mediumIconPathField
 
-            placeholderText: i18n("Use the KDE icon")
+            placeholderText: i18n("Use your default icon")
             Layout.fillWidth: true
         }
 
@@ -73,7 +73,7 @@ Kirigami.FormLayout {
         QQC2.TextField {
             id: lowIconPathField
 
-            placeholderText: i18n("Use the KDE icon")
+            placeholderText: i18n("Use your default icon")
             Layout.fillWidth: true
         }
 
@@ -95,7 +95,7 @@ Kirigami.FormLayout {
         QQC2.TextField {
             id: mutedIconPathField
 
-            placeholderText: i18n("Use the KDE icon")
+            placeholderText: i18n("Use your default icon")
             Layout.fillWidth: true
         }
 
