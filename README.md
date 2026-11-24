@@ -1,5 +1,7 @@
 # FS Volume
 
+Beta 0.7
+
 A small Plasma 6 panel widget that shows your default output volume as an icon and percentage. It adapts to horizontal and vertical panels and scales with panel size.
 
 Needs KDE Plasma 6, `plasma-pa`, and a PulseAudio-compatible audio server (PipeWire with `pipewire-pulse` works).

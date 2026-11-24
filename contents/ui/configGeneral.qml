@@ -7,8 +7,6 @@ import org.kde.kirigami as Kirigami
 Kirigami.FormLayout {
     id: page
 
-    signal settingValueChanged()
-
     property alias cfg_iconHighPath: highIconPathField.text
     property alias cfg_iconMediumPath: mediumIconPathField.text
     property alias cfg_iconLowPath: lowIconPathField.text
@@ -31,7 +29,6 @@ Kirigami.FormLayout {
 
         Kirigami.FormData.label: i18n("Speaker icon:")
         text: i18n("Show icon")
-        onToggled: page.settingValueChanged()
     }
 
     RowLayout {

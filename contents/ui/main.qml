@@ -16,7 +16,7 @@ PlasmoidItem {
     readonly property bool verticalPanel: Plasmoid.formFactor === PlasmaCore.Types.Vertical
         || Plasmoid.location === PlasmaCore.Types.LeftEdge
         || Plasmoid.location === PlasmaCore.Types.RightEdge
-    readonly property bool showIcon: Plasmoid.configuration.showIcon !== false
+    readonly property bool showIcon: Boolean(Plasmoid.configuration.showIcon)
 
     readonly property int updateBehavior: Math.max(0, Math.min(2, Number(Plasmoid.configuration.updateBehavior) || 0))
     readonly property int customInterval: Math.max(100, Math.min(2000, Number(Plasmoid.configuration.customInterval) || 250))
@@ -197,35 +197,12 @@ PlasmoidItem {
             }
             readonly property real iconSize: Math.max(12, Math.min(48, panelThickness * 0.68))
             readonly property int fontPixelSize: Math.max(10, Math.min(24, Math.round(iconSize * 0.72)))
-            readonly property bool inPanel: [
-                PlasmaCore.Types.TopEdge,
-                PlasmaCore.Types.RightEdge,
-                PlasmaCore.Types.BottomEdge,
-                PlasmaCore.Types.LeftEdge
-            ].includes(Plasmoid.location)
-
             implicitWidth: contentLoader.implicitWidth
             implicitHeight: contentLoader.implicitHeight
 
-            Layout.minimumWidth: {
-                if (root.verticalPanel) {
-                    return 0;
-                }
-                if (Plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
-                    return height;
-                }
-                return Kirigami.Units.gridUnit * 3;
-            }
-
-            Layout.minimumHeight: {
-                if (root.verticalPanel) {
-                    return width;
-                }
-                if (Plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
-                    return 0;
-                }
-                return Kirigami.Units.gridUnit * 3;
-            }
+            // Plasma uses the relevant axis: minimumWidth horizontally, minimumHeight vertically.
+            Layout.minimumWidth: implicitWidth
+            Layout.minimumHeight: implicitHeight
 
             Loader {
                 id: contentLoader
